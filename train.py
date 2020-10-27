@@ -1,5 +1,6 @@
 import copy
 import argparse
+from datetime import datetime
 
 import torch
 from torch.utils.data import random_split
@@ -31,30 +32,73 @@ def get_algo_list(algos):
         raise AlgorithmError('Algorithm undefined. Choose between (trans, tips, bubbles).')
 
 
-if __name__ == '__main__':
+def draw_loss_plot(train_loss, valid_loss, timestamp):
+    plt.figure()
+    plt.plot(train_loss, label='train')
+    plt.plot(valid_loss, label='validation')
+    plt.title('Loss over epochs')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.savefig(f'figures/loss_{timestamp}.png')
+    plt.show()
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--algos', type=str, default='all', help='algorithm to learn (default: all)')
-    args = parser.parse_args()
-    algo_list = get_algo_list(args.algos)
+
+def draw_accuracy_plots(train_acc, valid_acc, algo_list, timestamp):
+    plt.figure()
+    for algo in algo_list:
+        plt.plot(train_acc[algo], label=algo)
+    plt.title('Training accuracy over epochs')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.legend()
+    plt.savefig(f'figures/train_accuracy_{timestamp}.png')
+    plt.show()
+
+    plt.figure()
+    for algo in algo_list:
+        plt.plot(valid_acc[algo], label=algo)
+    plt.title('Validation accuracy over epochs')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.legend()
+    plt.savefig(f'figures/valid_accuracy_{timestamp}.png')
+    plt.show()
+
+
+def append_accuracy_list(accuracy_list, accuracy_per_graph, algo_list):
+    for algo in algo_list:
+        accuracy_list[algo].append(
+            sum([c for c, l in accuracy_per_graph[algo]]) / sum([l for c, l in accuracy_per_graph[algo]])
+        )
+
+
+def print_mean_accuracy(accuracy, algo_list):
+    for algo in algo_list:
+        print(f"\nACCURACY {algo}:", sum([c for c, l in accuracy[algo]]) / sum([l for c, l in accuracy[algo]]))
+
+
+def print_last_step_accuracy(last_step, algo_list):
+    for algo in algo_list:
+        print(f"\nLAST STEP ACC {algo}:\t", last_step[algo][0] / last_step[algo][1])
+
+
+def train(algo_list, test):
 
     hyperparameters = get_hyperparameters()
-
     device = hyperparameters['device']
     dim_latent = hyperparameters['dim_latent']
     batch_size = hyperparameters['batch_size']
     patience = hyperparameters['patience']
 
-    NUM_EPOCHS = 10
-
-    mode = 'test'
-    print(algo_list)
+    NUM_EPOCHS = 5
+    mode = 'test' if test else 'train'
+    time_now = datetime.now().strftime('%Y-%b-%d-%H-%M')
 
     processor = models.AlgorithmProcessor(dim_latent).to(device)
     processor.add_algorithms(algo_list)
     params = list(processor.parameters())
-    input()
-    model_path = 'processor.pt'
+    model_path = f'trained_models/processor_{time_now}.pt'
 
     ds = MultiAlgoDataset('data/train')
     ds_test = MultiAlgoDataset('data/test')
@@ -94,20 +138,13 @@ if __name__ == '__main__':
                                   'TIPS': [],
                                   'BUBBLES': []}
             for data in dl_train:
-                # processor.process_graph(data, optimizer, loss_per_graph, accuracy_per_graph, train=True, device=device)
+                # processor.process_graph(data, optimizer, loss_per_graph, accuracy_per_graph, train=True,
+                #                         device=device)
                 processor.process_graph_all(data, optimizer, loss_per_graph, accuracy_per_graph, train=True,
                                             device=device)
 
             loss_per_epoch_train.append(sum(loss_per_graph) / len(loss_per_graph))
-            accuracy_per_epoch_train['TRANS'].append(
-                sum([c for c, l in accuracy_per_graph['TRANS']]) / sum([l for c, l in accuracy_per_graph['TRANS']])
-            )
-            accuracy_per_epoch_train['TIPS'].append(
-                sum([c for c, l in accuracy_per_graph['TIPS']]) / sum([l for c, l in accuracy_per_graph['TIPS']])
-            )
-            accuracy_per_epoch_train['BUBBLES'].append(
-                sum([c for c, l in accuracy_per_graph['BUBBLES']]) / sum([l for c, l in accuracy_per_graph['BUBBLES']])
-            )
+            append_accuracy_list(accuracy_per_epoch_train, accuracy_per_graph, algo_list)
 
             # VALIDATION
             with torch.no_grad():
@@ -124,60 +161,17 @@ if __name__ == '__main__':
                     best_model.load_state_dict(copy.deepcopy(processor.state_dict()))
                     torch.save(best_model.state_dict(), model_path)
                 loss_per_epoch_valid.append(current_loss)
-                accuracy_per_epoch_valid['TRANS'].append(
-                    sum([c for c, l in accuracy_per_graph['TRANS']]) / sum([l for c, l in accuracy_per_graph['TRANS']])
-                )
-                accuracy_per_epoch_valid['TIPS'].append(
-                    sum([c for c, l in accuracy_per_graph['TIPS']]) / sum([l for c, l in accuracy_per_graph['TIPS']])
-                )
-                accuracy_per_epoch_valid['BUBBLES'].append(
-                    sum([c for c, l in accuracy_per_graph['BUBBLES']]) / sum(
-                        [l for c, l in accuracy_per_graph['BUBBLES']])
-                )
+                append_accuracy_list(accuracy_per_epoch_valid, accuracy_per_graph, algo_list)
 
-        counter = 0
-
-        plt.figure()
-        plt.plot(loss_per_epoch_train, label='train')
-        plt.plot(loss_per_epoch_valid, label='validation')
-        plt.title('Loss over epochs')
-        plt.xlabel('Epoch')
-        plt.ylabel('Loss')
-        plt.legend()
-        plt.savefig(f'figs/loss_all_{counter}.png')
-        plt.show()
-
-        plt.figure()
-        plt.plot(accuracy_per_epoch_train['TRANS'], label='trans')
-        plt.plot(accuracy_per_epoch_train['TIPS'], label='tips')
-        plt.plot(accuracy_per_epoch_train['BUBBLES'], label='bubbles')
-        plt.title('Training accuracy over epochs')
-        plt.xlabel('Epoch')
-        plt.ylabel('Accuracy')
-        plt.legend()
-        plt.savefig(f'figs/train_accuracy_all_{counter}.png')
-        plt.show()
-
-        plt.figure()
-        # print(accuracy_per_epoch_valid['TRANS'][-1])
-        # print(accuracy_per_epoch_valid['TIPS'][-1])
-        # print(accuracy_per_epoch_valid['BUBBLES'][-1])
-        plt.plot(accuracy_per_epoch_valid['TRANS'], label='trans')
-        plt.plot(accuracy_per_epoch_valid['TIPS'], label='tips')
-        plt.plot(accuracy_per_epoch_valid['BUBBLES'], label='bubbles')
-        plt.title('Validation accuracy over epochs')
-        plt.xlabel('Epoch')
-        plt.ylabel('Accuracy')
-        plt.legend()
-        plt.savefig(f'figs/valid_accuracy_all_{counter}.png')
-        plt.show()
+        draw_loss_plot(loss_per_epoch_train, loss_per_epoch_valid, time_now)
+        draw_accuracy_plots(accuracy_per_epoch_train, accuracy_per_epoch_valid, algo_list, time_now)
 
         torch.save(processor.state_dict(), model_path)
 
     processor.load_state_dict(torch.load(model_path))
 
     # TESTING
-    accuracy_test = []
+    # accuracy_test = []
     with torch.no_grad():
         processor.eval()
 
@@ -188,12 +182,20 @@ if __name__ == '__main__':
         last_step = {'TRANS': [],
                      'TIPS': [],
                      'BUBBLES': []}
+
         for data in dl_test:
             processor.process_graph_all(data, optimizer, loss_per_graph, accuracy, train=False, last_step=last_step)
-        print("\nACCURACY TRANS:", sum([c for c, l in accuracy['TRANS']]) / sum([l for c, l in accuracy['TRANS']]))
-        print("\nACCURACY TIPS:", sum([c for c, l in accuracy['TIPS']]) / sum([l for c, l in accuracy['TIPS']]))
-        print("\nACCURACY BUBBLES:",
-              sum([c for c, l in accuracy['BUBBLES']]) / sum([l for c, l in accuracy['BUBBLES']]))
-        print("\nLAST STEP ACC TRANS:\t", last_step['TRANS'][0] / last_step['TRANS'][1])
-        print("\nLAST STEP ACC TIPS:\t", last_step['TIPS'][0] / last_step['TIPS'][1])
-        print("\nLAST STEP ACC BUBBLES:\t", last_step['BUBBLES'][0] / last_step['BUBBLES'][1])
+
+        print_mean_accuracy(accuracy, algo_list)
+        print_last_step_accuracy(last_step, algo_list)
+
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--algos', type=str, default='all', help='algorithm to learn (default: all)')
+    parser.add_argument('--test', default=False, action='store_true')
+    args = parser.parse_args()
+    algorithm_list = get_algo_list(args.algos)
+    is_test = args.test
+    train(algorithm_list, is_test)

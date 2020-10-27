@@ -1,5 +1,6 @@
 data/
 figures/
+trained_models/
 processor.pt
 __pycache__/
 .idea/
