@@ -1,4 +1,5 @@
 data/
+figures/
 processor.pt
 __pycache__/
 .idea/

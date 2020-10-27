@@ -1,10 +1,10 @@
 import copy
+import argparse
 
 import torch
 from torch.utils.data import random_split
 import torch.nn as nn
 import torch.optim as optim
-import torch_geometric
 from torch_geometric.data import DataLoader
 import matplotlib.pyplot as plt
 
@@ -12,7 +12,31 @@ import models
 from datasets import MultiAlgoDataset
 from hyperparameters import get_hyperparameters
 
+
+class AlgorithmError(Exception):
+    pass
+
+
+def get_algo_list(algos):
+    args = algos.lower()
+    if args == 'all':
+        return ['TRANS', 'TIPS', 'BUBBLES']
+    elif args == 'trans' or args == 'transitive':
+        return ['TRANS']
+    elif args == 'tips':
+        return ['TIPS']
+    elif args == ['bubbles']:
+        return ['BUBBLES']
+    else:
+        raise AlgorithmError('Algorithm undefined. Choose between (trans, tips, bubbles).')
+
+
 if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--algos', type=str, default='all', help='algorithm to learn (default: all)')
+    args = parser.parse_args()
+    algo_list = get_algo_list(args.algos)
 
     hyperparameters = get_hyperparameters()
 
@@ -23,12 +47,13 @@ if __name__ == '__main__':
 
     NUM_EPOCHS = 10
 
-    mode = 'train'
+    mode = 'test'
+    print(algo_list)
 
     processor = models.AlgorithmProcessor(dim_latent).to(device)
-    processor.add_algorithms(['TRANS', 'TIPS', 'BUBBLES'])
+    processor.add_algorithms(algo_list)
     params = list(processor.parameters())
-
+    input()
     model_path = 'processor.pt'
 
     ds = MultiAlgoDataset('data/train')
