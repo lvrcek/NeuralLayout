@@ -21,7 +21,7 @@ if __name__ == '__main__':
     batch_size = hyperparameters['batch_size']
     patience = hyperparameters['patience']
 
-    NUM_EPOCHS = 300
+    NUM_EPOCHS = 10
 
     mode = 'train'
 
@@ -31,8 +31,8 @@ if __name__ == '__main__':
 
     model_path = 'processor.pt'
 
-    ds = MultiAlgoDataset('data/all_train')
-    ds_test = MultiAlgoDataset('data/lambda')
+    ds = MultiAlgoDataset('data/train')
+    ds_test = MultiAlgoDataset('data/test')
 
     num_graphs = len(ds)
     valid_fraction = 0.3

@@ -1,0 +1,4 @@
+data/
+processor.pt
+__pycache__/
+.idea/

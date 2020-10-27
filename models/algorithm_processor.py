@@ -101,7 +101,7 @@ class AlgorithmProcessor(nn.Module):
                 output, last_latent, term_pred = algo_net(node_features, edge_features, edge_index, last_latent)
                 correct = (output.sigmoid().round() == next_step).sum().item()
                 accuracy_list[algo].append((correct, output.size(0)))
-                if step == num_steps - 1:
+                if last_step is not None and step == num_steps - 1:
                     last_step[algo] = accuracy_list[algo][-1]
 
                 terminate = torch.tensor((1 if step == num_steps - 1 else 0,), dtype=torch.float)

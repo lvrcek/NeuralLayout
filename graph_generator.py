@@ -365,7 +365,7 @@ def write_all_to_file(filename, graph, graph_type, all_steps):
 
 if __name__ == '__main__':
 
-    data_path = os.path.abspath('data/ecoli/raw')
+    data_path = os.path.abspath('data/test/raw')
     if not os.path.isdir(data_path):
         os.mkdir(data_path)
 
@@ -459,25 +459,25 @@ if __name__ == '__main__':
     #     filename = os.path.join(data_path, f'{graph_type}_{i}.txt')
     #     write_to_file(filename, graph, graph_type, steps)
 
-    # # GENERATE TRAINING CHAINS
-    # graph_type = 'training_chain'
-    # num_graphs = 10
-    # chain_length = 400
-    # for i in range(num_graphs):
-    #     graph = generate_bubble_chain(chain_length)
-    #     steps_trans = remove_transitive(graph)
-    #     steps_tips = remove_tips(graph)
-    #     steps_bubbles = find_bubbles(graph)
-    #     filename = os.path.join(data_path, f'{graph_type}_{i}.txt')
-    #     write_all_to_file(filename, graph, graph_type, [steps_trans, steps_tips, steps_bubbles])
+    # GENERATE TRAINING CHAINS
+    graph_type = 'training_chain'
+    num_graphs = 10
+    chain_length = 50
+    for i in range(num_graphs):
+        graph = generate_bubble_chain(chain_length)
+        steps_trans = remove_transitive(graph)
+        steps_tips = remove_tips(graph)
+        steps_bubbles = find_bubbles(graph)
+        filename = os.path.join(data_path, f'{graph_type}_{i}.txt')
+        write_all_to_file(filename, graph, graph_type, [steps_trans, steps_tips, steps_bubbles])
 
-    # CREATE GRAPHS FROM CSV
-    graph_type = 'ecoli'
-    graph_path = '/home/lovro/Data/ecoli/ecoli.csv'
-    graph = read_csv(graph_path)
-    steps_trans = remove_transitive(graph)
-    steps_tips = remove_tips(graph)
-    steps_bubbles = find_bubbles(graph)
-    filename = os.path.join(data_path, f'{graph_type}.txt')
-    write_all_to_file(filename, graph, graph_type, [steps_trans, steps_tips, steps_bubbles])
+    # # CREATE GRAPHS FROM CSV
+    # graph_type = 'ecoli'
+    # graph_path = '/home/lovro/Data/ecoli/ecoli.csv'
+    # graph = read_csv(graph_path)
+    # steps_trans = remove_transitive(graph)
+    # steps_tips = remove_tips(graph)
+    # steps_bubbles = find_bubbles(graph)
+    # filename = os.path.join(data_path, f'{graph_type}.txt')
+    # write_all_to_file(filename, graph, graph_type, [steps_trans, steps_tips, steps_bubbles])
 
