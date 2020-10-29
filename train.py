@@ -10,7 +10,7 @@ from torch_geometric.data import DataLoader
 import matplotlib.pyplot as plt
 
 import models
-from datasets import MultiAlgoDataset
+from datasets import SingleAlgoDataset, MultiAlgoDataset
 from hyperparameters import get_hyperparameters
 
 
@@ -83,14 +83,14 @@ def print_last_step_accuracy(last_step, algo_list):
         print(f"\nLAST STEP ACC {algo}:\t", last_step[algo][0] / last_step[algo][1])
 
 
-def train(algo_list, test):
+def main(algo_list, test):
 
     hyperparameters = get_hyperparameters()
     num_epochs = hyperparameters['num_epochs']
     device = hyperparameters['device']
     dim_latent = hyperparameters['dim_latent']
     batch_size = hyperparameters['batch_size']
-    patience_limit = hyperparameters['patience']
+    patience_limit = hyperparameters['patience_limit']
 
     mode = 'test' if test else 'train'
     time_now = datetime.now().strftime('%Y-%b-%d-%H-%M')
@@ -100,8 +100,10 @@ def train(algo_list, test):
     params = list(processor.parameters())
     model_path = f'trained_models/processor_{time_now}.pt'
 
-    ds = MultiAlgoDataset('data/train')
-    ds_test = MultiAlgoDataset('data/test')
+    train_path = 'data/train'
+    test_path = 'data/test'
+    ds = MultiAlgoDataset(train_path) if len(algo_list) > 1 else SingleAlgoDataset(train_path)
+    ds_test = MultiAlgoDataset(test_path) if len(algo_list) > 1 else SingleAlgoDataset(test_path)
 
     num_graphs = len(ds)
     valid_fraction = 0.3
@@ -176,7 +178,6 @@ def train(algo_list, test):
     processor.load_state_dict(torch.load(model_path))
 
     # TESTING
-    # accuracy_test = []
     with torch.no_grad():
         processor.eval()
 
@@ -203,4 +204,4 @@ if __name__ == '__main__':
     arguments = parser.parse_args()
     algorithm_list = get_algo_list(arguments.algos)
     is_test = arguments.test
-    train(algorithm_list, is_test)
+    main(algorithm_list, is_test)
