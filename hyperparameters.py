@@ -3,6 +3,7 @@ import torch
 
 def get_hyperparameters():
     return {
+        "num_epochs": 50,
         "dim_latent": 32,
         "dim_nodes": 1,
         # "dim_target": 2,
@@ -15,7 +16,7 @@ def get_hyperparameters():
         "sigmoid_offset": -300,
         "device": "cuda" if torch.cuda.is_available() else "cpu",
         "calculate_termination_statistics": True,
-        "lr": 0.000500,
+        "lr": 5e-4,
         "weight_decay": 0,
         "bias": False,
     }

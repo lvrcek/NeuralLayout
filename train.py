@@ -86,12 +86,12 @@ def print_last_step_accuracy(last_step, algo_list):
 def train(algo_list, test):
 
     hyperparameters = get_hyperparameters()
+    num_epochs = hyperparameters['num_epochs']
     device = hyperparameters['device']
     dim_latent = hyperparameters['dim_latent']
     batch_size = hyperparameters['batch_size']
-    patience = hyperparameters['patience']
+    patience_limit = hyperparameters['patience']
 
-    NUM_EPOCHS = 5
     mode = 'test' if test else 'train'
     time_now = datetime.now().strftime('%Y-%b-%d-%H-%M')
 
@@ -115,6 +115,7 @@ def train(algo_list, test):
 
     optimizer = optim.Adam(params, lr=1e-5)
 
+    patience = 0
     best_model = models.AlgorithmProcessor(dim_latent)
     best_model.algorithms = nn.ModuleDict(processor.algorithms.items())
     best_model.load_state_dict(copy.deepcopy(processor.state_dict()))
@@ -130,9 +131,10 @@ def train(algo_list, test):
                                     'TIPS': [],
                                     'BUBBLES': []}
 
-        for epoch in range(NUM_EPOCHS):
+        for epoch in range(num_epochs):
             print(f'Epoch: {epoch}')
             processor.train()
+            patience += 1
             loss_per_graph = []
             accuracy_per_graph = {'TRANS': [],
                                   'TIPS': [],
@@ -158,8 +160,11 @@ def train(algo_list, test):
                     # print(loss_per_graph)
                 current_loss = sum(loss_per_graph) / len(loss_per_graph)
                 if len(loss_per_epoch_valid) > 0 and current_loss < min(loss_per_epoch_valid):
+                    patience = 0
                     best_model.load_state_dict(copy.deepcopy(processor.state_dict()))
                     torch.save(best_model.state_dict(), model_path)
+                elif patience > patience_limit:
+                    break
                 loss_per_epoch_valid.append(current_loss)
                 append_accuracy_list(accuracy_per_epoch_valid, accuracy_per_graph, algo_list)
 
@@ -195,7 +200,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--algos', type=str, default='all', help='algorithm to learn (default: all)')
     parser.add_argument('--test', default=False, action='store_true')
-    args = parser.parse_args()
-    algorithm_list = get_algo_list(args.algos)
-    is_test = args.test
+    arguments = parser.parse_args()
+    algorithm_list = get_algo_list(arguments.algos)
+    is_test = arguments.test
     train(algorithm_list, is_test)

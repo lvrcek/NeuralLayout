@@ -73,7 +73,6 @@ class AlgorithmProcessor(nn.Module):
 
         loss_list.append(self.algorithms['TRANS'].get_total_loss())  # returns list of all the losses per step
 
-
     def process_graph_all(self, graph, optimizer, loss_list, accuracy_list, train=True, device='cpu', last_step=None):
         num_steps_trans = graph.x_trans.shape[1]
         num_steps_tips = graph.x_tips.shape[1]

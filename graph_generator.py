@@ -349,7 +349,6 @@ def write_all_to_file(filename, graph, graph_type, all_steps):
         f.write(f'{graph_type} {graph.num_nodes}\n')
         f.write(' '.join(list(map(str, map(int, graph.edge_index[0])))) + '\n')
         f.write(' '.join(list(map(str, map(int, graph.edge_index[1])))) + '\n')
-        # f.write(' '.join(list(map(str, [int(el.item()) for el in graph.x]))) + '\n')
         f.write(' '.join(list(map(str, [round(float(el.item()), 3) for el in graph.edge_attr]))) + '\n')
         # Each step is a new update in node attributes until the termination of an algorithm
         for step in steps_trans:
