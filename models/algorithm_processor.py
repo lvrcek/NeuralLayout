@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-import models.bfs_network
+import models
 from layers import MPNN
 from hyperparameters import get_hyperparameters
 
@@ -42,10 +42,10 @@ class AlgorithmProcessor(nn.Module):
         for algo in algo_list:
             if algo == 'BFS':
                 self.algorithms[algo] = models.bfs_network.BFSNetwork(node_features, edge_features,
-                                                                      latent_features, self).to(device)
+                                                   latent_features, self).to(device)
             elif algo in ['TRANS', 'TIPS', 'BUBBLES']:
                 self.algorithms[algo] = models.traversal_network.TraversalNetwork(node_features, edge_features,
-                                                                                    latent_features, self).to(device)
+                                                         latent_features, self).to(device)
             else:
                 # For other algorithms
                 pass
