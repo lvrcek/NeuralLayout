@@ -12,7 +12,7 @@ class MPNN(nng.MessagePassing):
         self.out_channels = out_channels
         self.M = nn.Sequential(nn.Linear(2*in_channels+edge_feature, out_channels, bias=bias),
                                nn.LeakyReLU())
-        self.U = nn.Sequential(nn.Linear(2*in_channels, out_channels, bias=bias),
+        self.U = nn.Sequential(nn.Linear(in_channels + out_channels, out_channels, bias=bias),
                                nn.LeakyReLU())
         self.gru = nn.GRUCell(out_channels, out_channels, bias=bias)
 

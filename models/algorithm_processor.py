@@ -42,10 +42,10 @@ class AlgorithmProcessor(nn.Module):
         for algo in algo_list:
             if algo == 'BFS':
                 self.algorithms[algo] = models.bfs_network.BFSNetwork(node_features, edge_features,
-                                                   latent_features, self).to(device)
+                                                                      latent_features, self).to(device)
             elif algo in ['TRANS', 'TIPS', 'BUBBLES']:
                 self.algorithms[algo] = models.traversal_network.TraversalNetwork(node_features, edge_features,
-                                                         latent_features, self).to(device)
+                                                                                  latent_features, self).to(device)
             else:
                 # For other algorithms
                 pass
@@ -58,6 +58,7 @@ class AlgorithmProcessor(nn.Module):
         self.processor.zero_hidden(graph.num_nodes)
         last_latent = self.processor.hidden.detach()
         # torch.autograd.set_detect_anomaly(True)
+
         for step in range(num_steps):
             node_features = graph.x[:, step].clone().detach().float().to(device)
             next_step = graph.y[:, step].clone().detach().float().to(device)
@@ -84,8 +85,8 @@ class AlgorithmProcessor(nn.Module):
             algo_net.init_losses()
         self.processor.zero_hidden(graph.num_nodes)
         last_latent = self.processor.hidden.detach()
-        for step in range(num_steps):
 
+        for step in range(num_steps):
             for algo, algo_net in self.algorithms.items():
                 if algo == 'TRANS':
                     node_features = graph.x_trans[:, step].clone().detach().float().to(device)
