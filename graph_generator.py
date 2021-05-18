@@ -1,3 +1,4 @@
+import argparse
 import os
 import random
 
@@ -364,119 +365,147 @@ def write_all_to_file(filename, graph, graph_type, all_steps):
 
 if __name__ == '__main__':
 
-    data_path = os.path.abspath('data/test/raw')
+    parser = argparse.ArgumentParser(description='Types of graph to generate.')
+    parser.add_argument('--ladder', action='store_true', help='generate ladder graphs')
+    parser.add_argument('--grid', action='store_true', help='generate grid graphs')
+    parser.add_argument('--erdos', action='store_true', help='generate Erdos-Renyi graphs')
+    parser.add_argument('--barabasi', action='store_true', help='generate Barabasi-Albert graphs')
+    parser.add_argument('--tree', action='store_true', help='generate balanced tree graphs')
+    parser.add_argument('--transitive', action='store_true', help='generate path graphs with transitive edges')
+    parser.add_argument('--tips', action='store_true', help='generate path graphs with tips')
+    parser.add_argument('--bubbles', action='store_true', help='generate path graphs with bubbles')
+    parser.add_argument('--training', action='store_true', help='generate path graphs for training and testing')
+    parser.add_argument('--from_csv', action='store_true', help='parse CSV file to generate graph')
+    parser.add_argument('--csv_path', type=str, help='path to CSV file')
+    parser.add_argument('--csv_type', type=str, help='organism on whose graph the model will be run, e.g. ecoli',
+                        default='unknown')
+    parser.add_argument('store_path', type=str, help='Path to where the data should be stored')
+
+    args = parser.parse_args()
+    data_path = os.path.abspath(args.store_path)
     if not os.path.isdir(data_path):
-        os.mkdir(data_path)
+        os.makedirs(data_path)
 
-    # # GENERATE LADDER GRAPHS
-    # graph_type = 'ladder'
-    # ladder_min, ladder_max = 5, 30
-    # for i in range(ladder_min, ladder_max+1):
-    #     graph = generate_ladder(i)
-    #     start = random.randint(0, graph.num_nodes // 2 - 1)
-    #     bfs_steps = bfs(graph, start)
-    #     filename = os.path.join(data_path, f'{graph_type}_{i}.txt')
-    #     write_to_file(filename, graph, graph_type, bfs_steps)
-    #
-    # # GENERATE GRID GRAPHS
-    # graph_type = 'grid'
-    # grid_min, grid_max = 3, 10
-    # for i in range(grid_min, grid_max+1):
-    #     for j in range(grid_min, grid_max+1):
-    #         graph = generate_grid(i, j)
-    #         start = random.randint(0, graph.num_nodes // 2 - 1)
-    #         bfs_steps = bfs(graph, start)
-    #         filename = os.path.join(data_path, f'{graph_type}_{i}_{j}.txt')
-    #         write_to_file(filename, graph, graph_type, bfs_steps)
-    #
-    # # GENERATE ERDOS-RENYI GRAPHS
-    # graph_type = 'erdos_renyi'
-    # nodes_min, nodes_max = 5, 20
-    # probabilities = [0.2, 0.4, 0.6]
-    # for i in range(nodes_min, nodes_max+1):
-    #     for p in probabilities:
-    #         graph = generate_erdos_renyi_graph(i, p)
-    #         if len(graph.edge_index[0]) == 0:
-    #             continue
-    #         start = random.randint(0, graph.num_nodes // 2 - 1)
-    #         bfs_steps = bfs(graph, start)
-    #         if len(bfs_steps) <= 1:
-    #             continue
-    #         filename = os.path.join(data_path, f'{graph_type}_{i}_{p}.txt')
-    #         write_to_file(filename, graph, graph_type, bfs_steps)
-    #
-    # # GENERATE BARABASI-ALBERT GRAPHS
-    # graph_type = 'barabasi_albert'
-    # nodes_min, nodes_max = 5, 20
-    # connections = [1, 2, 3]
-    # for i in range(nodes_min, nodes_max):
-    #     for c in connections:
-    #         graph = generate_barabasi_albert_graph(i, c)
-    #         start = random.randint(0, graph.num_nodes // 2 - 1)
-    #         bfs_steps = bfs(graph, start)
-    #         filename = os.path.join(data_path, f'{graph_type}_{i}_{c}.txt')
-    #         write_to_file(filename, graph, graph_type, bfs_steps)
+    if args.ladder:
+        # GENERATE LADDER GRAPHS
+        graph_type = 'ladder'
+        ladder_min, ladder_max = 5, 30
+        for i in range(ladder_min, ladder_max+1):
+            graph = generate_ladder(i)
+            start = random.randint(0, graph.num_nodes // 2 - 1)
+            bfs_steps = bfs(graph, start)
+            filename = os.path.join(data_path, f'{graph_type}_{i}.txt')
+            write_to_file(filename, graph, graph_type, bfs_steps)
 
-    # # GENERATE BALANCED TREE - testing
-    # graph_type = 'balanced_tree'
-    # tree_deg = [3, 4]
-    # height_min, height_max = 3, 7
-    # for i in tree_deg:
-    #     for j in range(height_min, height_max+1):
-    #         graph = generate_balanced_tree(i, j)
-    #         bfs_steps = bfs(graph, 0)
-    #         filename = os.path.join(data_path, f'{graph_type}_{i}_{j}.txt')
-    #         write_to_file(filename, graph, graph_type, bfs_steps)
+    if args.grid:
+        # GENERATE GRID GRAPHS
+        graph_type = 'grid'
+        grid_min, grid_max = 3, 10
+        for i in range(grid_min, grid_max+1):
+            for j in range(grid_min, grid_max+1):
+                graph = generate_grid(i, j)
+                start = random.randint(0, graph.num_nodes // 2 - 1)
+                bfs_steps = bfs(graph, start)
+                filename = os.path.join(data_path, f'{graph_type}_{i}_{j}.txt')
+                write_to_file(filename, graph, graph_type, bfs_steps)
 
-    # # GENERATE TRANSITIVE CHAINS
-    # graph_type = 'transitive_chain'
-    # num_graphs = 10
-    # chain_length = 1000
-    # for i in range(num_graphs):
-    #     graph = generate_transitive_chain(chain_length)
-    #     steps = remove_transitive(graph)
-    #     filename = os.path.join(data_path, f'{graph_type}_{i}.txt')
-    #     write_to_file(filename, graph, graph_type, steps)
+    if args.erdos:
+        # GENERATE ERDOS-RENYI GRAPHS
+        graph_type = 'erdos_renyi'
+        nodes_min, nodes_max = 5, 20
+        probabilities = [0.2, 0.4, 0.6]
+        for i in range(nodes_min, nodes_max+1):
+            for p in probabilities:
+                graph = generate_erdos_renyi_graph(i, p)
+                if len(graph.edge_index[0]) == 0:
+                    continue
+                start = random.randint(0, graph.num_nodes // 2 - 1)
+                bfs_steps = bfs(graph, start)
+                if len(bfs_steps) <= 1:
+                    continue
+                filename = os.path.join(data_path, f'{graph_type}_{i}_{p}.txt')
+                write_to_file(filename, graph, graph_type, bfs_steps)
 
-    # # GENERATE TIP CHAINS
-    # graph_type = 'tip_chain'
-    # num_graphs = 10
-    # chain_length = 400
-    # for i in range(num_graphs):
-    #     graph = generate_tip_chain(chain_length)
-    #     steps = remove_tips(graph)
-    #     filename = os.path.join(data_path, f'{graph_type}_{i}.txt')
-    #     write_to_file(filename, graph, graph_type, steps)
+    if args.barabasi:
+        # GENERATE BARABASI-ALBERT GRAPHS
+        graph_type = 'barabasi_albert'
+        nodes_min, nodes_max = 5, 20
+        connections = [1, 2, 3]
+        for i in range(nodes_min, nodes_max):
+            for c in connections:
+                graph = generate_barabasi_albert_graph(i, c)
+                start = random.randint(0, graph.num_nodes // 2 - 1)
+                bfs_steps = bfs(graph, start)
+                filename = os.path.join(data_path, f'{graph_type}_{i}_{c}.txt')
+                write_to_file(filename, graph, graph_type, bfs_steps)
 
-    # # GENERATE BUBBLE CHAINS
-    # graph_type = 'bubble_chain'
-    # num_graphs = 10
-    # chain_length = 400
-    # for i in range(num_graphs):
-    #     graph = generate_bubble_chain(chain_length)
-    #     steps = find_bubbles(graph)
-    #     filename = os.path.join(data_path, f'{graph_type}_{i}.txt')
-    #     write_to_file(filename, graph, graph_type, steps)
+    if args.tree:
+        # GENERATE BALANCED TREE - testing
+        graph_type = 'balanced_tree'
+        tree_deg = [3, 4]
+        height_min, height_max = 3, 7
+        for i in tree_deg:
+            for j in range(height_min, height_max+1):
+                graph = generate_balanced_tree(i, j)
+                bfs_steps = bfs(graph, 0)
+                filename = os.path.join(data_path, f'{graph_type}_{i}_{j}.txt')
+                write_to_file(filename, graph, graph_type, bfs_steps)
 
-    # GENERATE TRAINING CHAINS
-    graph_type = 'training_chain'
-    num_graphs = 10
-    chain_length = 50
-    for i in range(num_graphs):
-        graph = generate_bubble_chain(chain_length)
+    if args.transitive:
+        # GENERATE TRANSITIVE CHAINS
+        graph_type = 'transitive_chain'
+        num_graphs = 10
+        chain_length = 1000
+        for i in range(num_graphs):
+            graph = generate_transitive_chain(chain_length)
+            steps = remove_transitive(graph)
+            filename = os.path.join(data_path, f'{graph_type}_{i}.txt')
+            write_to_file(filename, graph, graph_type, steps)
+
+    if args.tips:
+        # GENERATE TIP CHAINS
+        graph_type = 'tip_chain'
+        num_graphs = 10
+        chain_length = 400
+        for i in range(num_graphs):
+            graph = generate_tip_chain(chain_length)
+            steps = remove_tips(graph)
+            filename = os.path.join(data_path, f'{graph_type}_{i}.txt')
+            write_to_file(filename, graph, graph_type, steps)
+
+    if args.bubbles:
+        # GENERATE BUBBLE CHAINS
+        graph_type = 'bubble_chain'
+        num_graphs = 10
+        chain_length = 400
+        for i in range(num_graphs):
+            graph = generate_bubble_chain(chain_length)
+            steps = find_bubbles(graph)
+            filename = os.path.join(data_path, f'{graph_type}_{i}.txt')
+            write_to_file(filename, graph, graph_type, steps)
+
+    if args.training:
+        # GENERATE TRAINING CHAINS
+        graph_type = 'training_chain'
+        num_graphs = 10
+        chain_length = 50
+        for i in range(num_graphs):
+            graph = generate_bubble_chain(chain_length)
+            steps_trans = remove_transitive(graph)
+            steps_tips = remove_tips(graph)
+            steps_bubbles = find_bubbles(graph)
+            filename = os.path.join(data_path, f'{graph_type}_{i}.txt')
+            write_all_to_file(filename, graph, graph_type, [steps_trans, steps_tips, steps_bubbles])
+
+    if args.from_csv:
+        # CREATE GRAPHS FROM CSV
+        graph_type = args.csv_type
+        graph_path = args.csv_path
+        if not os.path.isfile(graph_path):
+            raise OSError('CSV graph file does not exist!')
+        graph = read_csv(graph_path)
         steps_trans = remove_transitive(graph)
         steps_tips = remove_tips(graph)
         steps_bubbles = find_bubbles(graph)
-        filename = os.path.join(data_path, f'{graph_type}_{i}.txt')
+        filename = os.path.join(data_path, f'{graph_type}.txt')
         write_all_to_file(filename, graph, graph_type, [steps_trans, steps_tips, steps_bubbles])
-
-    # # CREATE GRAPHS FROM CSV
-    # graph_type = 'ecoli'
-    # graph_path = '/home/lovro/Data/ecoli/ecoli.csv'
-    # graph = read_csv(graph_path)
-    # steps_trans = remove_transitive(graph)
-    # steps_tips = remove_tips(graph)
-    # steps_bubbles = find_bubbles(graph)
-    # filename = os.path.join(data_path, f'{graph_type}.txt')
-    # write_all_to_file(filename, graph, graph_type, [steps_trans, steps_tips, steps_bubbles])
-
