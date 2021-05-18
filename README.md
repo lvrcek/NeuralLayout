@@ -28,3 +28,11 @@ Run the training process:
 ```
 python train.py
 ```
+
+## Acknowledgement
+This work was performed at Faculty of Electrical Engineering and Computing, University of Zagreb,
+and Genome Institute of Singapore, A*STAR, as a part of the ARAP program. It was also partially
+funded by the European Union through the European Regional Development Fund under the grant
+KK.01.1.1.01.0009 (DATACROSS) and has been supported in part by the Croatian Science Foun-
+dation under the project Single genome and metagenome assembly (IP-2018-01-5886) and “Young
+Researchers” Career Development Program.
