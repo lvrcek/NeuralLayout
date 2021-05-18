@@ -374,7 +374,8 @@ if __name__ == '__main__':
     parser.add_argument('--transitive', action='store_true', help='generate path graphs with transitive edges')
     parser.add_argument('--tips', action='store_true', help='generate path graphs with tips')
     parser.add_argument('--bubbles', action='store_true', help='generate path graphs with bubbles')
-    parser.add_argument('--training', action='store_true', help='generate path graphs for training and testing')
+    parser.add_argument('--training', action='store_true', help='generate path graphs for training')
+    parser.add_argument('--testing', action='store_true', help='generate path graphs for testing')
     parser.add_argument('--from_csv', action='store_true', help='parse CSV file to generate graph')
     parser.add_argument('--csv_path', type=str, help='path to CSV file')
     parser.add_argument('--csv_type', type=str, help='organism on whose graph the model will be run, e.g. ecoli',
@@ -454,7 +455,7 @@ if __name__ == '__main__':
     if args.transitive:
         # GENERATE TRANSITIVE CHAINS
         graph_type = 'transitive_chain'
-        num_graphs = 10
+        num_graphs = 100
         chain_length = 1000
         for i in range(num_graphs):
             graph = generate_transitive_chain(chain_length)
@@ -465,7 +466,7 @@ if __name__ == '__main__':
     if args.tips:
         # GENERATE TIP CHAINS
         graph_type = 'tip_chain'
-        num_graphs = 10
+        num_graphs = 100
         chain_length = 400
         for i in range(num_graphs):
             graph = generate_tip_chain(chain_length)
@@ -476,7 +477,7 @@ if __name__ == '__main__':
     if args.bubbles:
         # GENERATE BUBBLE CHAINS
         graph_type = 'bubble_chain'
-        num_graphs = 10
+        num_graphs = 100
         chain_length = 400
         for i in range(num_graphs):
             graph = generate_bubble_chain(chain_length)
@@ -487,6 +488,19 @@ if __name__ == '__main__':
     if args.training:
         # GENERATE TRAINING CHAINS
         graph_type = 'training_chain'
+        num_graphs = 100
+        chain_length = 50
+        for i in range(num_graphs):
+            graph = generate_bubble_chain(chain_length)
+            steps_trans = remove_transitive(graph)
+            steps_tips = remove_tips(graph)
+            steps_bubbles = find_bubbles(graph)
+            filename = os.path.join(data_path, f'{graph_type}_{i}.txt')
+            write_all_to_file(filename, graph, graph_type, [steps_trans, steps_tips, steps_bubbles])
+
+    if args.testing:
+        # GENERATE TRAINING CHAINS
+        graph_type = 'testing_chain'
         num_graphs = 10
         chain_length = 50
         for i in range(num_graphs):
