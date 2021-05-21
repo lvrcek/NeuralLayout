@@ -101,8 +101,8 @@ def main(algo_list, test):
     params = list(processor.parameters())
     model_path = f'trained_models/processor_{time_now}.pt'
 
-    train_path = 'data/train1'
-    test_path = 'data/test1'
+    train_path = 'data/train'
+    test_path = 'data/test'
 
     if not os.path.isdir(os.path.join(train_path, 'processed')):
         os.mkdir(os.path.join(train_path, 'processed'))
