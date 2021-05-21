@@ -1,10 +1,10 @@
 import argparse
 import os
 import random
+import subprocess
 
 import torch
 import torch_geometric
-from torch_geometric.data import Data
 from torch_geometric.utils import from_networkx
 import networkx as nx
 
@@ -363,6 +363,29 @@ def write_all_to_file(filename, graph, graph_type, all_steps):
         f.write('TERMINATE_BUBBLES\n')
 
 
+def from_fastq(fastq_path, store_path, threads=1):
+    fastq_path = os.path.abspath(fastq_path)
+    tmp_path = os.path.abspath(os.path.join(store_path, '../tmp'))
+    raven = os.path.abspath('vendor/raven/build/bin/raven')
+    if not os.path.isdir(tmp_path):
+        os.mkdir(tmp_path)
+    subprocess.run(f'{raven} --weaken -t{threads} -p0 {fastq_path} > assembly.fasta', shell=True, cwd=tmp_path)
+    csv_path = os.path.join(tmp_path, 'graph_1.csv')
+    return csv_path
+
+
+def clean_raw_csv(raw_csv, fastq_type, data_path):
+    clean_csv = os.path.join(data_path, fastq_type + '.csv')
+    with open(clean_csv, 'w') as f_out, open(raw_csv) as f_in:
+        for line in f_in.readlines():
+            line = line.strip().split(',')
+            if line[2] == '0':
+                continue
+            out_info = line[0].split()[0] + ',' + line[1].split()[0] + '\n'
+            f_out.write(out_info)
+    return clean_csv
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Types of graph to generate.')
@@ -380,10 +403,15 @@ if __name__ == '__main__':
     parser.add_argument('--csv_path', type=str, help='path to CSV file')
     parser.add_argument('--csv_type', type=str, help='organism on whose graph the model will be run, e.g. ecoli',
                         default='unknown')
-    parser.add_argument('store_path', type=str, help='Path to where the data should be stored')
+    parser.add_argument('--from_fastq', action='store_true', help='run raven to generate graphs in CSV')
+    parser.add_argument('--fastq_path', type=str, help='path to FASTQ file')
+    parser.add_argument('--fastq_type', type=str, help='type of the genomic data, e.g., ecoli',
+                        default='unknown')
+    parser.add_argument('--threads', type=int, default=1, help='number of threads used for raven')
+    parser.add_argument('store_dir', type=str, help='Directory to where the data should be stored')
 
     args = parser.parse_args()
-    data_path = os.path.abspath(args.store_path)
+    data_path = os.path.abspath(args.store_dir)
     if not os.path.isdir(data_path):
         os.makedirs(data_path)
 
@@ -523,3 +551,13 @@ if __name__ == '__main__':
         steps_bubbles = find_bubbles(graph)
         filename = os.path.join(data_path, f'{graph_type}.txt')
         write_all_to_file(filename, graph, graph_type, [steps_trans, steps_tips, steps_bubbles])
+
+    if args.from_fastq:
+        fastq_path = args.fastq_path
+        threads = args.threads
+        fastq_type = args.fastq_type
+        if not os.path.isfile(fastq_path):
+            raise OSError('FASTQ file does not exist!')
+        raw_csv = from_fastq(fastq_path, data_path, threads)
+        clean_csv = clean_raw_csv(raw_csv, fastq_type, data_path)
+
