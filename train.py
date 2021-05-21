@@ -1,3 +1,4 @@
+import os
 import copy
 import argparse
 from datetime import datetime
@@ -100,8 +101,14 @@ def main(algo_list, test):
     params = list(processor.parameters())
     model_path = f'trained_models/processor_{time_now}.pt'
 
-    train_path = 'data/train'
-    test_path = 'data/test'
+    train_path = 'data/train1'
+    test_path = 'data/test1'
+
+    if not os.path.isdir(os.path.join(train_path, 'processed')):
+        os.mkdir(os.path.join(train_path, 'processed'))
+    if not os.path.isdir(os.path.join(test_path, 'processed')):
+        os.mkdir(os.path.join(test_path, 'processed'))
+
     ds = MultiAlgoDataset(train_path) if len(algo_list) > 1 else SingleAlgoDataset(train_path)
     ds_test = MultiAlgoDataset(test_path) if len(algo_list) > 1 else SingleAlgoDataset(test_path)
 
