@@ -4,8 +4,10 @@ data/reads/ecoli_reads.fastq.gz
 !data/reads/lambda_reads.fastq
 !data/train/
 data/train/processed/*
-!data/test/
-data/test/processed/*
+!data/test_synth/
+data/test_synth/processed/*
+!data/test_real/
+data/test_real/processed/*
 
 figures/
 trained_models/
