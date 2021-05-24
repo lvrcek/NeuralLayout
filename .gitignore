@@ -1,7 +1,14 @@
-data/
+data/*
+!data/reads/
+data/reads/ecoli_reads.fastq.gz
+!data/reads/lambda_reads.fastq
+!data/train/
+data/train/processed/*
+!data/test/
+data/test/processed/*
+
 figures/
 trained_models/
 processor.pt
 __pycache__/
 .idea/
-!data/reads/lambda_reads.fastq
