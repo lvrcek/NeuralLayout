@@ -87,7 +87,7 @@ def print_last_step_accuracy(last_step, algo_list):
         print(f"\nLAST STEP ACC {algo}:\t", last_step[algo][0] / last_step[algo][1])
 
 
-def main(algo_list, test):
+def main(algo_list, test, train_path, test_path):
 
     hyperparameters = get_hyperparameters()
     num_epochs = hyperparameters['num_epochs']
@@ -103,9 +103,6 @@ def main(algo_list, test):
     processor.add_algorithms(algo_list)
     params = list(processor.parameters())
     model_path = f'trained_models/processor_{time_now}.pt'
-
-    train_path = 'data/train'
-    test_path = 'data/test'
 
     if not os.path.isdir(os.path.join(train_path, 'processed')):
         os.mkdir(os.path.join(train_path, 'processed'))
@@ -211,7 +208,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--algos', type=str, default='all', help='algorithm to learn (default: all)')
     parser.add_argument('--test', default=False, action='store_true')
+    parser.add_argument('--train_path', type=str, default='data/train', help='path to the training data')
+    parser.add_argument('--test_path', type=str, default='data/test', help='path to testing data')
     arguments = parser.parse_args()
     algorithm_list = get_algo_list(arguments.algos)
     is_test = arguments.test
-    main(algorithm_list, is_test)
+    train_pth = arguments.train_path
+    test_pth = arguments.test_path
+    main(algorithm_list, is_test, train_pth, test_pth)
