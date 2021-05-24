@@ -76,7 +76,10 @@ def append_accuracy_list(accuracy_list, accuracy_per_graph, algo_list):
 
 def print_mean_accuracy(accuracy, algo_list):
     for algo in algo_list:
-        print(f"\nACCURACY {algo}:", sum([c for c, l in accuracy[algo]]) / sum([l for c, l in accuracy[algo]]))
+        try:
+            print(f"\nACCURACY {algo}:", sum([c for c, l in accuracy[algo]]) / sum([l for c, l in accuracy[algo]]))
+        except ZeroDivisionError:
+            print(f"\nACCURACY {algo}:", 0)
 
 
 def print_last_step_accuracy(last_step, algo_list):

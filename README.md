@@ -13,15 +13,15 @@ By relying on Pytorch Geometric, we construct an MPNN-based model to which would
 
 First download the code:
 ```
-git clone https://github.com/lvrcek/NeuralLayout.git
+git clone --recursive https://github.com/lvrcek/NeuralLayout.git
 ```
 
 TODO: include the requirements file for pip installation
 
 Generate the training and testing data by running:
 ```
-python graph_generator.py data/train --training
-python graph_generator.py data/test --testing
+python graph_generator.py data/train/raw --training
+python graph_generator.py data/test/raw --testing
 ```
 
 Run the training process:

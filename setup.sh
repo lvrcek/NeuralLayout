@@ -1,7 +1,9 @@
-# Create data directories
+# Create necessary directories
 mkdir -p data/train/raw data/train/processed
 mkdir -p data/test/raw data/test/processed
 mkdir -p data/reads
+mkdir trained_models
+mkdir figures
 
 # Compile Raven
 cd vendor/raven
