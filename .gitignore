@@ -4,3 +4,4 @@ trained_models/
 processor.pt
 __pycache__/
 .idea/
+!data/reads/lambda_reads.fastq
