@@ -8,8 +8,17 @@ At first, the graph is overly complicated and needs to be simplified. This is do
 
 By relying on Pytorch Geometric, we construct an MPNN-based model to which would simulate the deterministic algorithms. This is a proof-of-concept work to show that graph neural networks can be used on assembly graphs.
 
+## Requirements
+#### Basic usage:
+- Python >= 3.8
+- Pip >= 19.2
 
-## Installation and usage
+#### Dependencies for Raven
+- gcc 4.8+ | clang 4.0+
+- cmake 3.11+
+- zlib 1.2.8+
+
+## Installation
 
 First download the code:
 ```bash
@@ -17,24 +26,32 @@ git clone --recursive https://github.com/lvrcek/NeuralLayout.git
 cd NeuralLayout
 ```
 
-You can set up the environment by running the setup script:
+Create the virtual environment:
+```bash
+python -m venv env
+source env/bin/activate
+```
+
+Install the requirements:
+```bash
+pip install -r requirements.txt
+```
+
+If you want to use Raven for creating the graphs from raw genomic reads in FASTQ format, run the following script.
+If not, you can skip this part.
 ```bash
 source setup.sh
 ```
 
-#### Dependencies
-- gcc 4.8+ | clang 4.0+
-- cmake 3.11+
-- zlib 1.2.8+
-
+## Usage
 
 Basic dataset is already included in this repository. It consists of synthetic training data, synthetic testing data,
 and real testing data obtained from the assembly graph of lambda phage. This enables you to run two
 plug&play examples. For training the model on synthetic data and testing also on synthetic data, run:
-```
+```bash
 python train.py --test_path data/test_synth
 ```
-For training on synthetic data and testing on real lmbda phage data, run:
+For training on synthetic data and testing on real lambda phage data, run:
 ```bash
 python train.py --test_path data/test_real
 ```

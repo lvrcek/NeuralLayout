@@ -9,6 +9,7 @@ data/test_synth/processed/*
 !data/test_real/
 data/test_real/processed/*
 
+env/
 figures/
 trained_models/
 processor.pt

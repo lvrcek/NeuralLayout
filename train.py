@@ -108,6 +108,10 @@ def main(algo_list, test, train_path, test_path):
         os.mkdir(os.path.join(train_path, 'processed'))
     if not os.path.isdir(os.path.join(test_path, 'processed')):
         os.mkdir(os.path.join(test_path, 'processed'))
+    if not os.path.isdir('trained_models'):
+        os.mkdir('trained_models')
+    if not os.path.isdir('figures'):
+        os.mkdir('figures')
 
     ds = MultiAlgoDataset(train_path) if len(algo_list) > 1 else SingleAlgoDataset(train_path)
     ds_test = MultiAlgoDataset(test_path) if len(algo_list) > 1 else SingleAlgoDataset(test_path)
