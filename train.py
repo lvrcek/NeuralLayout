@@ -200,7 +200,7 @@ def main(algo_list, test, train_path, test_path):
             processor.process_graph_all(data, optimizer, loss_per_graph, accuracy, train=False, last_step=last_step)
 
         print_mean_accuracy(accuracy, algo_list)
-        print_last_step_accuracy(last_step, algo_list)
+        # print_last_step_accuracy(last_step, algo_list)
 
 
 if __name__ == '__main__':

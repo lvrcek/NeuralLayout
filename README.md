@@ -14,20 +14,44 @@ By relying on Pytorch Geometric, we construct an MPNN-based model to which would
 First download the code:
 ```
 git clone --recursive https://github.com/lvrcek/NeuralLayout.git
+cd NeuralLayout
 ```
 
-TODO: include the requirements file for pip installation
+You can set up the environment by running the setup script:
+```
+source setup.sh
+```
 
-Generate the training and testing data by running:
+Basic dataset is already included in this repository. It consists of synthetic training data, synthetic testing data,
+and real testing data obtained from the assembly graph of lambda phage. This enables you to run two
+plug&play examples. For training the model on synthetic data and testing also on synthetic data, run:
+```
+python train.py --test_path data/test_synth
+```
+For training on synthetic data and testing on real lmbda phage data, run:
+```
+python train.py --test_path data/test_real
+```
+
+You can also generate the training and testing data manually, by running:
 ```
 python graph_generator.py data/train/raw --training
 python graph_generator.py data/test/raw --testing
 ```
 
-Run the training process:
+To test this model on some other reads in FASTQ format, put them into the `data/reads` directory.
+For example, in case you `ecoli.fastq`, you should first run Raven assembler to generate graphs in CSV format,
+and then create TXT files suitable for this model and save them into e.g. `data/test/raw`.
+This can be done by running the following commands:
 ```
+python graph_generator.py --from_fastq --fastq_path data/reads/ecoli.fastq --fastq_type ecoli data/csv
+python graph_generator.py --from_csv --csv_path data/csv/ecoli.csv --csv_type ecoli data/test/raw
 python train.py
 ```
+This will first create the graph in the CSV format and save it into `data/csv` directory under the name `ecoli.csv`.
+The second line will parse the `ecoli.csv` file and save it in a more appropriate format into the `data/test/raw` directory.
+Finally, you run the training loop with default arguments `data/train` for train path and `data/test` for test path.
+
 
 ## Acknowledgement
 This work was performed at Faculty of Electrical Engineering and Computing, University of Zagreb,
