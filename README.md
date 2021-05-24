@@ -9,18 +9,24 @@ At first, the graph is overly complicated and needs to be simplified. This is do
 By relying on Pytorch Geometric, we construct an MPNN-based model to which would simulate the deterministic algorithms. This is a proof-of-concept work to show that graph neural networks can be used on assembly graphs.
 
 
-## Installation and running
+## Installation and usage
 
 First download the code:
-```
+```bash
 git clone --recursive https://github.com/lvrcek/NeuralLayout.git
 cd NeuralLayout
 ```
 
 You can set up the environment by running the setup script:
-```
+```bash
 source setup.sh
 ```
+
+#### Dependencies
+- gcc 4.8+ | clang 4.0+
+- cmake 3.11+
+- zlib 1.2.8+
+
 
 Basic dataset is already included in this repository. It consists of synthetic training data, synthetic testing data,
 and real testing data obtained from the assembly graph of lambda phage. This enables you to run two
@@ -29,12 +35,12 @@ plug&play examples. For training the model on synthetic data and testing also on
 python train.py --test_path data/test_synth
 ```
 For training on synthetic data and testing on real lmbda phage data, run:
-```
+```bash
 python train.py --test_path data/test_real
 ```
 
 You can also generate the training and testing data manually, by running:
-```
+```bash
 python graph_generator.py data/train/raw --training
 python graph_generator.py data/test/raw --testing
 ```
@@ -43,7 +49,7 @@ To test this model on some other reads in FASTQ format, put them into the `data/
 For example, in case you `ecoli.fastq`, you should first run Raven assembler to generate graphs in CSV format,
 and then create TXT files suitable for this model and save them into e.g. `data/test/raw`.
 This can be done by running the following commands:
-```
+```bash
 python graph_generator.py --from_fastq --fastq_path data/reads/ecoli.fastq --fastq_type ecoli data/csv
 python graph_generator.py --from_csv --csv_path data/csv/ecoli.csv --csv_type ecoli data/test/raw
 python train.py
